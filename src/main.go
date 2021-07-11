@@ -15,6 +15,7 @@ func main() {
 	s := &gin.Service{
 		DAO: dao.NewDAO(db),
 	}
+	dao.Migration(db)
 	r := s.SetupRouter()
 
 	// By default it serves on :8080 unless a

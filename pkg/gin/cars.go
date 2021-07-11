@@ -9,7 +9,10 @@ import (
 func (s *Service) ListCarsHandler(c *gin.Context) {
 	cars, err := s.DAO.Car.List()
 	if err != nil {
-		c.AbortWithStatus(http.StatusNoContent)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"status": http.StatusInternalServerError,
+			"error":  err.Error(),
+		})
 	}
 	c.JSON(http.StatusOK, cars)
 }

@@ -19,6 +19,6 @@ type Car struct {
 
 // Interfaces
 type CarDAO interface {
-	Create(car *Car) (*Car, error)
-	List() ([]*Car, error)
+	Create(car Car) (Car, error)
+	List() ([]Car, error)
 }
