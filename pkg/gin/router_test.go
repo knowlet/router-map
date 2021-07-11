@@ -9,7 +9,8 @@ import (
 )
 
 func TestSetupRouter(t *testing.T) {
-	router := SetupRouter()
+	s := &Service{}
+	router := s.SetupRouter()
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/", nil)
