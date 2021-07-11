@@ -1,0 +1,6 @@
+run:
+  deadline: 3m
+
+linters:
+  disable:
+  - errcheck
