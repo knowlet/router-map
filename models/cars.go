@@ -9,6 +9,8 @@ type Car struct {
 	gorm.Model
 	Url       string
 	Ip        string
+	User      string
+	Pass      string
 	Country   string
 	Province  string
 	City      string
