@@ -6,7 +6,7 @@ import (
 	"github.com/ip2location/ip2location-go"
 )
 
-func Getip(ip string) (string, string, float32, float32, error) {
+func Getip(ip string) (region string, city string, lat float32, lng float32, err error) {
 	db, err := ip2location.OpenDB("../IP2LOCATION-LITE-DB5.BIN")
 
 	if err != nil {

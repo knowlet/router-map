@@ -16,6 +16,9 @@ func (s Service) SetupRouter() *gin.Engine {
 
 	r.GET("/", GetIndexHandler)
 
-	r.GET("/cars", s.ListCarsHandler)
+	api := r.Group("/api")
+	api.GET("/cars", s.ListCarsHandler)
+	api.POST("/new", s.NewCarHandler)
+	api.POST("/check", s.CheckCarHandler)
 	return r
 }
