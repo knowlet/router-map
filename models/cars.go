@@ -6,17 +6,17 @@ import (
 
 // Entity
 type Car struct {
-	gorm.Model
-	Url       string  `json:"url" binding:"required"`
-	Ip        string  `json:"ip"`
-	User      string  `json:"user" binding:"required"`
-	Pass      string  `json:"pass" binding:"required"`
-	Country   string  `json:"country"`
-	Province  string  `json:"province"`
-	City      string  `json:"city"`
-	Longitude float64 `json:"lng"`
-	Latitude  float64 `json:"lat"`
-	Rtts      []Rtt   `json:"rtts"`
+	gorm.Model `json:"-"`
+	Url        string  `json:"url" binding:"required"`
+	Ip         string  `json:"ip"`
+	User       string  `json:"user"`
+	Pass       string  `json:"pass"`
+	Country    string  `json:"country"`
+	Province   string  `json:"province"`
+	City       string  `json:"city"`
+	Longitude  float64 `json:"lng"`
+	Latitude   float64 `json:"lat"`
+	Rtts       []Rtt   `json:"rtts"`
 }
 
 // Interfaces

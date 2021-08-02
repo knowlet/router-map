@@ -2,6 +2,7 @@ package gin
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"net"
 	"net/http"
@@ -13,6 +14,16 @@ import (
 	"github.com/knowlet/router-map/pkg/geoip2"
 )
 
+type GeoJSON struct {
+	Type       string                 `json:"type"`
+	Geometry   Geometry               `json:"geometry"`
+	Properties map[string]interface{} `json:"properties"`
+}
+type Geometry struct {
+	Type        string    `json:"type"`
+	Coordinates []float64 `json:"coordinates"`
+}
+
 func (s *Service) ListCarsHandler(c *gin.Context) {
 	cars, err := s.DAO.Car.List()
 	if err != nil {
@@ -22,7 +33,22 @@ func (s *Service) ListCarsHandler(c *gin.Context) {
 		})
 		return
 	}
-	c.JSON(http.StatusOK, cars)
+	json := []GeoJSON{}
+	for _, car := range cars {
+		json = append(json, GeoJSON{
+			Type: "Feature",
+			Geometry: Geometry{
+				Type:        "Point",
+				Coordinates: []float64{car.Longitude, car.Latitude},
+			},
+			Properties: map[string]interface{}{
+				"name":  fmt.Sprintf("Car #%d", car.ID),
+				"car":   car,
+				"color": "",
+			},
+		})
+	}
+	c.JSON(http.StatusOK, json)
 }
 
 func getUrlIP(rawurl string) (string, error) {
