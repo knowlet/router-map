@@ -7,7 +7,7 @@ import (
 )
 
 type config struct {
-	dsn string `env:"DATASOURCENAME" envDefault:"file::memory:?cache=shared"`
+	DSN string `env:"DATASOURCENAME" envDefault:"file::memory:?cache=shared"`
 }
 
 func NewGormClient() (*gorm.DB, error) {
@@ -16,7 +16,7 @@ func NewGormClient() (*gorm.DB, error) {
 		return nil, err
 	}
 	// github.com/mattn/go-sqlite3
-	db, err := gorm.Open(sqlite.Open(cfg.dsn), &gorm.Config{})
+	db, err := gorm.Open(sqlite.Open(cfg.DSN), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}
