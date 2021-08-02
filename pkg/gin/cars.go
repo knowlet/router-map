@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 	"github.com/knowlet/router-map/models"
 	"github.com/knowlet/router-map/pkg/geoip2"
 )
@@ -134,16 +135,14 @@ func (s *Service) createCar(json models.Car) (car models.Car, err error) {
 
 func (s *Service) NewCarHandler(c *gin.Context) {
 	json := models.Car{}
-	// read json
-	if err := c.ShouldBindJSON(&json); err != nil {
+	if err := c.ShouldBindBodyWith(&json, binding.MsgPack); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	car, err := s.createCar(json)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"status": http.StatusInternalServerError,
-			"error":  err.Error(),
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
 		})
 		return
 	}
@@ -151,25 +150,23 @@ func (s *Service) NewCarHandler(c *gin.Context) {
 }
 
 func (s *Service) BatchCarHandler(c *gin.Context) {
-	cars := []models.Car{}
-	// read json
-	if err := c.ShouldBindJSON(&cars); err != nil {
+	json := []models.Car{}
+	if err := c.ShouldBindBodyWith(&json, binding.MsgPack); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
-	cs := []models.Car{}
-	for _, car := range cars {
+	cars := []models.Car{}
+	for _, car := range json {
 		car, err := s.createCar(car)
 		if err != nil {
 			fmt.Println(err)
 			continue
 		}
-		cs = append(cs, car)
+		cars = append(cars, car)
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"input":  len(cars),
-		"output": len(cs),
+		"input":  len(json),
+		"output": len(cars),
 	})
 }
