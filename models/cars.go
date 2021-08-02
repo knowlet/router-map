@@ -7,7 +7,7 @@ import (
 // Entity
 type Car struct {
 	gorm.Model `json:"-"`
-	Url        string  `json:"url" binding:"required"`
+	Url        string  `gorm:"uniqueIndex" json:"url" binding:"required"`
 	Ip         string  `json:"ip"`
 	User       string  `json:"user"`
 	Pass       string  `json:"pass"`
