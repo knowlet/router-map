@@ -112,6 +112,26 @@ func (s *Service) CheckCarHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": code, "html": body})
 }
 
+func (s *Service) createCar(json models.Car) (car models.Car, err error) {
+	// lookup addr
+	addr, err := getUrlIP(json.Url)
+	if err != nil {
+		return car, err
+	}
+
+	// lookup geo location
+	region, city, lat, lng, err := geoip2.Getip(addr)
+	if err != nil {
+		return car, err
+	}
+	json.Ip = addr
+	json.Country = region
+	json.City = city
+	json.Latitude = float64(lat)
+	json.Longitude = float64(lng)
+	return s.DAO.Car.Create(json)
+}
+
 func (s *Service) NewCarHandler(c *gin.Context) {
 	json := models.Car{}
 	// read json
@@ -119,31 +139,7 @@ func (s *Service) NewCarHandler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	// lookup addr
-	addr, err := getUrlIP(json.Url)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"status": http.StatusInternalServerError,
-			"error":  err.Error(),
-		})
-		return
-	}
-
-	// lookup geo location
-	region, city, lat, lng, err := geoip2.Getip(addr)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"status": http.StatusInternalServerError,
-			"error":  err.Error(),
-		})
-		return
-	}
-	json.Ip = addr
-	json.Country = region
-	json.City = city
-	json.Latitude = float64(lat)
-	json.Longitude = float64(lng)
-	car, err := s.DAO.Car.Create(json)
+	car, err := s.createCar(json)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"status": http.StatusInternalServerError,
@@ -152,4 +148,28 @@ func (s *Service) NewCarHandler(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, car)
+}
+
+func (s *Service) BatchCarHandler(c *gin.Context) {
+	cars := []models.Car{}
+	// read json
+	if err := c.ShouldBindJSON(&cars); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	cs := []models.Car{}
+	for _, car := range cars {
+		car, err := s.createCar(car)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		cs = append(cs, car)
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"input":  len(cars),
+		"output": len(cs),
+	})
 }
