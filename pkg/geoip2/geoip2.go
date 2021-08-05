@@ -6,8 +6,8 @@ import (
 	"github.com/ip2location/ip2location-go"
 )
 
-func Getip(ip string) (region string, city string, lat float32, lng float32, err error) {
-	db, err := ip2location.OpenDB("../IP2LOCATION-LITE-DB5.BIN")
+func Getip(ip string) (country string, city string, lat float32, lng float32, err error) {
+	db, err := ip2location.OpenDB("IP2LOCATION-LITE-DB5.BIN")
 
 	if err != nil {
 		return "", "", 0, 0, err
@@ -44,5 +44,5 @@ func Getip(ip string) (region string, city string, lat float32, lng float32, err
 	fmt.Printf("api version: %s\n", ip2location.Api_version())
 
 	db.Close()
-	return results.Region, results.City, results.Latitude, results.Longitude, nil
+	return results.Country_long, results.City, results.Latitude, results.Longitude, nil
 }
