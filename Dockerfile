@@ -3,6 +3,7 @@
 # Set Builder environment
 FROM golang:alpine as builder
 WORKDIR /workdir
+RUN apk --update --no-cache add build-base sqlite-libs sqlite-dev
 COPY . .
 RUN go build -o car src/main.go
 
