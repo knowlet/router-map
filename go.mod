@@ -4,7 +4,7 @@ go 1.16
 
 require (
 	github.com/caarlos0/env/v6 v6.6.2
-	github.com/gin-gonic/gin v1.7.2 // indirect
+	github.com/gin-gonic/gin v1.7.7
 	github.com/go-playground/validator/v10 v10.7.0 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/ip2location/ip2location-go v8.3.0+incompatible
