@@ -17,6 +17,8 @@ type Car struct {
 	Longitude  float64 `json:"lng"`
 	Latitude   float64 `json:"lat"`
 	Rtts       []Rtt   `json:"rtts"`
+	Vendor     string  `json:"vendor"`
+	Protocol   string  `json:"protocol"`
 }
 
 // Interfaces
