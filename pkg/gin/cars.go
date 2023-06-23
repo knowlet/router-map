@@ -173,3 +173,22 @@ func (s *Service) BatchCarHandler(c *gin.Context) {
 		"output": len(cars),
 	})
 }
+
+type deleteRequest struct {
+	ID uint `json:"id" binding:"required"`
+}
+
+func (s *Service) DeleteCarHandler(c *gin.Context) {
+	var json deleteRequest
+	if err := c.ShouldBindJSON(&json); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if err := s.DAO.Car.Delete(json.ID); err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, json)
+}

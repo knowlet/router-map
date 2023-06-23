@@ -25,4 +25,5 @@ type Car struct {
 type CarDAO interface {
 	Create(car Car) (Car, error)
 	List() ([]Car, error)
+	Delete(id uint) error
 }
