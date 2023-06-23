@@ -26,11 +26,7 @@ func (dao CarDAO) Update(car *models.Car) (*models.Car, error) {
 }
 
 func (dao CarDAO) Delete(id uint) error {
-	err := dao.DB.Delete(models.Car{Model: gorm.Model{ID: id}}).Error
-	if err != nil {
-		return err
-	}
-	return nil
+	return dao.DB.Delete(&models.Car{Model: gorm.Model{ID: id}}).Error
 }
 
 func (dao CarDAO) Get(id uint) (models.Car, error) {
