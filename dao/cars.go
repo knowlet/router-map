@@ -46,3 +46,18 @@ func (dao CarDAO) List() ([]models.Car, error) {
 	}
 	return queryModel, nil
 }
+
+func (dao CarDAO) GetProvinces() []string {
+	var provinces []string
+	dao.DB.Table("cars").Select("distinct province").Order("province").Scan(&provinces)
+	return provinces
+}
+
+func (dao CarDAO) GetCars(province string) ([]models.Car, error) {
+	var cars []models.Car
+	err := dao.DB.Where("province = ?", province).Find(&cars).Error
+	if err != nil {
+		return nil, err
+	}
+	return cars, nil
+}
