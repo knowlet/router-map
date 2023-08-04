@@ -228,3 +228,20 @@ func (s *Service) ExportCarsHandler(c *gin.Context) {
 	c.Header("Content-Disposition", "attachment; filename=cars_"+province+".csv")
 	c.Data(http.StatusOK, "text/csv", []byte(csv))
 }
+
+// UpdateCarHandler updates a car
+func (s *Service) UpdateCarHandler(c *gin.Context) {
+	json := models.Car{}
+	if err := c.ShouldBindBodyWith(&json, binding.MsgPack); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	car, err := s.DAO.Car.Update(&json)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, car)
+}
