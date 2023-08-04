@@ -208,9 +208,9 @@ func (s *Service) ExportCarsHandler(c *gin.Context) {
 		})
 		return
 	}
-	csv := "id,url,ip,user,pass,country,province,city,longitude,latitude,vendor,protocol\n"
+	csv := "id,url,ip,user,pass,country,province,city,unit,longitude,latitude,vendor,protocol\n"
 	for _, car := range cars {
-		csv += fmt.Sprintf("%d,%s,%s,%s,%s,%s,%s,%s,%f,%f,%s,%s\n",
+		csv += fmt.Sprintf("%d,%s,%s,%s,%s,%s,%s,%s,%s,%f,%f,%s,%s\n",
 			car.ID,
 			car.Url,
 			car.Ip,
@@ -219,6 +219,7 @@ func (s *Service) ExportCarsHandler(c *gin.Context) {
 			car.Country,
 			car.Province,
 			car.City,
+			car.Unit,
 			car.Longitude,
 			car.Latitude,
 			car.Vendor,
