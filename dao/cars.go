@@ -18,7 +18,7 @@ func (dao CarDAO) Create(car models.Car) (models.Car, error) {
 }
 
 func (dao CarDAO) Update(car *models.Car) (*models.Car, error) {
-	err := dao.DB.Save(car).Error
+	err := dao.DB.Model(&models.Car{}).Where("url = ?", car.Url).Updates(car).Error
 	if err != nil {
 		return nil, err
 	}

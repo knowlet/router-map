@@ -26,6 +26,7 @@ type Car struct {
 type CarDAO interface {
 	Create(car Car) (Car, error)
 	List() ([]Car, error)
+	Update(car *Car) (*Car, error)
 	Delete(id uint) error
 	GetProvinces() []string
 	GetCars(province string) ([]Car, error)
