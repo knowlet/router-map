@@ -192,3 +192,39 @@ func (s *Service) DeleteCarHandler(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, json)
 }
+
+// GetProvincesHandler returns a list of provinces
+func (s *Service) GetProvincesHandler(c *gin.Context) {
+	c.JSON(http.StatusOK, s.DAO.Car.GetProvinces())
+}
+
+// ExportCarsHandler return a csv file of cars with filter of province
+func (s *Service) ExportCarsHandler(c *gin.Context) {
+	province := c.Param("province")
+	cars, err := s.DAO.Car.GetCars(province)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	csv := "id,url,ip,user,pass,country,province,city,longitude,latitude,vendor,protocol\n"
+	for _, car := range cars {
+		csv += fmt.Sprintf("%d,%s,%s,%s,%s,%s,%s,%s,%f,%f,%s,%s\n",
+			car.ID,
+			car.Url,
+			car.Ip,
+			car.User,
+			car.Pass,
+			car.Country,
+			car.Province,
+			car.City,
+			car.Longitude,
+			car.Latitude,
+			car.Vendor,
+			car.Protocol,
+		)
+	}
+	c.Header("Content-Disposition", "attachment; filename=cars_"+province+".csv")
+	c.Data(http.StatusOK, "text/csv", []byte(csv))
+}
