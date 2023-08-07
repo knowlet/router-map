@@ -18,7 +18,11 @@ func (s Service) SetupRouter() *gin.Engine {
 
 	api := r.Group("/api")
 	api.GET("/cars", s.ListCarsHandler)
+	api.GET("/cars/:province", s.ExportCarsHandler)
+	api.GET("/provinces", s.GetProvincesHandler)
 	api.POST("/new", s.NewCarHandler)
+	api.POST("/update", s.UpdateCarHandler)
+	api.POST("/delete", s.DeleteCarHandler)
 	api.POST("/batch", s.BatchCarHandler)
 	api.POST("/check", s.CheckCarHandler)
 	return r

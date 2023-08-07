@@ -14,13 +14,20 @@ type Car struct {
 	Country    string  `json:"country"`
 	Province   string  `json:"province"`
 	City       string  `json:"city"`
+	Unit       string  `json:"unit"`
 	Longitude  float64 `json:"lng"`
 	Latitude   float64 `json:"lat"`
 	Rtts       []Rtt   `json:"rtts"`
+	Vendor     string  `json:"vendor"`
+	Protocol   string  `json:"protocol"`
 }
 
 // Interfaces
 type CarDAO interface {
 	Create(car Car) (Car, error)
 	List() ([]Car, error)
+	Update(car *Car) (*Car, error)
+	Delete(id uint) error
+	GetProvinces() []string
+	GetCars(province string) ([]Car, error)
 }

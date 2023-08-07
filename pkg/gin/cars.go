@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"math/rand"
 	"net"
 	"net/http"
 	"net/url"
@@ -35,29 +34,7 @@ func (s *Service) ListCarsHandler(c *gin.Context) {
 		})
 		return
 	}
-	// add random proxy geo
-	p := cars[rand.Intn(len(cars))]
-	json := []GeoJSON{
-		{
-			Type: "Feature",
-			Geometry: Geometry{
-				Type:        "Point",
-				Coordinates: []float64{121.531852722168, 25.0477600097656},
-			},
-			Properties: map[string]interface{}{
-				"origin_id":           0,
-				"origin_city":         "Taipei",
-				"origin_country":      "Taiwan",
-				"origin_lon":          121.531852722168,
-				"origin_lat":          25.0477600097656,
-				"destination_id":      p.ID,
-				"destination_city":    p.City,
-				"destination_country": p.Country,
-				"destination_lon":     p.Longitude,
-				"destination_lat":     p.Latitude,
-			},
-		},
-	}
+	json := []GeoJSON{}
 	for _, car := range cars {
 		json = append(json, GeoJSON{
 			Type: "Feature",
@@ -66,19 +43,8 @@ func (s *Service) ListCarsHandler(c *gin.Context) {
 				Coordinates: []float64{car.Longitude, car.Latitude},
 			},
 			Properties: map[string]interface{}{
-				"name":                fmt.Sprintf("Car #%d", car.ID),
-				"car":                 car,
-				"color":               "",
-				"origin_id":           p.ID,
-				"origin_city":         p.City,
-				"origin_country":      p.Country,
-				"origin_lon":          p.Longitude,
-				"origin_lat":          p.Latitude,
-				"destination_id":      car.ID,
-				"destination_city":    car.City,
-				"destination_country": car.Country,
-				"destination_lon":     car.Longitude,
-				"destination_lat":     car.Latitude,
+				"name": fmt.Sprintf("Car #%d", car.ID),
+				"car":  car,
 			},
 		})
 	}
@@ -159,8 +125,12 @@ func (s *Service) createCar(json models.Car) (car models.Car, err error) {
 		return car, err
 	}
 	json.Ip = addr
-	json.Country = region
-	json.City = city
+	if json.Country == "" {
+		json.Country = region
+	}
+	if json.City == "" {
+		json.City = city
+	}
 	json.Latitude = float64(lat)
 	json.Longitude = float64(lng)
 	return s.DAO.Car.Create(json)
@@ -202,4 +172,77 @@ func (s *Service) BatchCarHandler(c *gin.Context) {
 		"input":  len(json),
 		"output": len(cars),
 	})
+}
+
+type deleteRequest struct {
+	ID uint `json:"id" binding:"required"`
+}
+
+func (s *Service) DeleteCarHandler(c *gin.Context) {
+	var json deleteRequest
+	if err := c.ShouldBindJSON(&json); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if err := s.DAO.Car.Delete(json.ID); err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, json)
+}
+
+// GetProvincesHandler returns a list of provinces
+func (s *Service) GetProvincesHandler(c *gin.Context) {
+	c.JSON(http.StatusOK, s.DAO.Car.GetProvinces())
+}
+
+// ExportCarsHandler return a csv file of cars with filter of province
+func (s *Service) ExportCarsHandler(c *gin.Context) {
+	province := c.Param("province")
+	cars, err := s.DAO.Car.GetCars(province)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	csv := "id,url,ip,user,pass,country,province,city,unit,longitude,latitude,vendor,protocol\n"
+	for _, car := range cars {
+		csv += fmt.Sprintf("%d,%s,%s,%s,%s,%s,%s,%s,%s,%f,%f,%s,%s\n",
+			car.ID,
+			car.Url,
+			car.Ip,
+			car.User,
+			car.Pass,
+			car.Country,
+			car.Province,
+			car.City,
+			car.Unit,
+			car.Longitude,
+			car.Latitude,
+			car.Vendor,
+			car.Protocol,
+		)
+	}
+	c.Header("Content-Disposition", "attachment; filename=cars_"+province+".csv")
+	c.Data(http.StatusOK, "text/csv", []byte(csv))
+}
+
+// UpdateCarHandler updates a car
+func (s *Service) UpdateCarHandler(c *gin.Context) {
+	json := models.Car{}
+	if err := c.ShouldBindBodyWith(&json, binding.MsgPack); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	car, err := s.DAO.Car.Update(&json)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, car)
 }
