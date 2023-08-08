@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math/rand"
 	"net"
 	"net/http"
 	"net/url"
@@ -34,7 +35,29 @@ func (s *Service) ListCarsHandler(c *gin.Context) {
 		})
 		return
 	}
-	json := []GeoJSON{}
+	// add random proxy geo
+	p := cars[rand.Intn(len(cars))]
+	json := []GeoJSON{
+		{
+			Type: "Feature",
+			Geometry: Geometry{
+				Type:        "Point",
+				Coordinates: []float64{121.531852722168, 25.0477600097656},
+			},
+			Properties: map[string]interface{}{
+				"origin_id":           0,
+				"origin_city":         "Taipei",
+				"origin_country":      "Taiwan",
+				"origin_lon":          121.531852722168,
+				"origin_lat":          25.0477600097656,
+				"destination_id":      p.ID,
+				"destination_city":    p.City,
+				"destination_country": p.Country,
+				"destination_lon":     p.Longitude,
+				"destination_lat":     p.Latitude,
+			},
+		},
+	}
 	for _, car := range cars {
 		json = append(json, GeoJSON{
 			Type: "Feature",
@@ -43,8 +66,19 @@ func (s *Service) ListCarsHandler(c *gin.Context) {
 				Coordinates: []float64{car.Longitude, car.Latitude},
 			},
 			Properties: map[string]interface{}{
-				"name": fmt.Sprintf("Car #%d", car.ID),
-				"car":  car,
+				"name":                fmt.Sprintf("Car #%d", car.ID),
+				"car":                 car,
+				"color":               "",
+				"origin_id":           p.ID,
+				"origin_city":         p.City,
+				"origin_country":      p.Country,
+				"origin_lon":          p.Longitude,
+				"origin_lat":          p.Latitude,
+				"destination_id":      car.ID,
+				"destination_city":    car.City,
+				"destination_country": car.Country,
+				"destination_lon":     car.Longitude,
+				"destination_lat":     car.Latitude,
 			},
 		})
 	}
