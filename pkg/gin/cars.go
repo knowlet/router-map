@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"math/rand"
 	"net"
 	"net/http"
 	"net/url"
@@ -14,6 +13,7 @@ import (
 	"github.com/gin-gonic/gin/binding"
 	"github.com/knowlet/router-map/models"
 	"github.com/knowlet/router-map/pkg/geoip2"
+	"gorm.io/gorm"
 )
 
 type GeoJSON struct {
@@ -36,7 +36,14 @@ func (s *Service) ListCarsHandler(c *gin.Context) {
 		return
 	}
 	// add random proxy geo
-	p := cars[rand.Intn(len(cars))]
+	// p := cars[rand.Intn(len(cars))]
+	p := models.Car{
+		Model:     gorm.Model{ID: 0},
+		City:      "Tokyo",
+		Country:   "Japan",
+		Latitude:  35.68,
+		Longitude: 139.69,
+	}
 	json := []GeoJSON{
 		{
 			Type: "Feature",
