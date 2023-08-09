@@ -25,5 +25,6 @@ func (s Service) SetupRouter() *gin.Engine {
 	api.POST("/delete", s.DeleteCarHandler)
 	api.POST("/batch", s.BatchCarHandler)
 	api.POST("/check", s.CheckCarHandler)
+	api.GET("/cities", s.GetCitiesHandler)
 	return r
 }

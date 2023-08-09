@@ -53,6 +53,12 @@ func (dao CarDAO) GetProvinces() []string {
 	return provinces
 }
 
+func (dao CarDAO) GetCities() []string {
+	var cities []string
+	dao.DB.Table("cars").Select("distinct city").Order("city").Scan(&cities)
+	return cities
+}
+
 func (dao CarDAO) GetCars(province string) ([]models.Car, error) {
 	var cars []models.Car
 	err := dao.DB.Where("province = ?", province).Find(&cars).Error

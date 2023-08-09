@@ -239,6 +239,11 @@ func (s *Service) GetProvincesHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, s.DAO.Car.GetProvinces())
 }
 
+// GetCitiesHandler returns a list of cities
+func (s *Service) GetCitiesHandler(c *gin.Context) {
+	c.JSON(http.StatusOK, s.DAO.Car.GetCities())
+}
+
 // ExportCarsHandler return a csv file of cars with filter of province
 func (s *Service) ExportCarsHandler(c *gin.Context) {
 	province := c.Param("province")

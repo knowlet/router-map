@@ -30,4 +30,5 @@ type CarDAO interface {
 	Delete(id uint) error
 	GetProvinces() []string
 	GetCars(province string) ([]Car, error)
+	GetCities() []string
 }
