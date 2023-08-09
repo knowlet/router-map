@@ -29,6 +29,7 @@ type CarDAO interface {
 	Update(car *Car) (*Car, error)
 	Delete(id uint) error
 	GetProvinces() []string
-	GetCars(province string) ([]Car, error)
+	GetCarsByProvince(province string) ([]Car, error)
+	GetCarsByCity(city string) ([]Car, error)
 	GetCities() []string
 }

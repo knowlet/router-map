@@ -59,9 +59,18 @@ func (dao CarDAO) GetCities() []string {
 	return cities
 }
 
-func (dao CarDAO) GetCars(province string) ([]models.Car, error) {
+func (dao CarDAO) GetCarsByProvince(province string) ([]models.Car, error) {
 	var cars []models.Car
 	err := dao.DB.Where("province = ?", province).Find(&cars).Error
+	if err != nil {
+		return nil, err
+	}
+	return cars, nil
+}
+
+func (dao CarDAO) GetCarsByCity(city string) ([]models.Car, error) {
+	var cars []models.Car
+	err := dao.DB.Where("city = ?", city).Find(&cars).Error
 	if err != nil {
 		return nil, err
 	}
