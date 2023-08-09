@@ -247,7 +247,19 @@ func (s *Service) GetCitiesHandler(c *gin.Context) {
 // ExportCarsHandler return a csv file of cars with filter of province
 func (s *Service) ExportCarsHandler(c *gin.Context) {
 	province := c.Param("province")
-	cars, err := s.DAO.Car.GetCars(province)
+	city := c.Param("city")
+	var cars []models.Car
+	var err error
+	if province != "" {
+		cars, err = s.DAO.Car.GetCarsByProvince(province)
+	} else if city != "" {
+		cars, err = s.DAO.Car.GetCarsByCity(city)
+	} else {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error": "no input",
+		})
+		return
+	}
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
@@ -272,7 +284,11 @@ func (s *Service) ExportCarsHandler(c *gin.Context) {
 			car.Protocol,
 		)
 	}
-	c.Header("Content-Disposition", "attachment; filename=cars_"+province+".csv")
+	if province != "" {
+		c.Header("Content-Disposition", "attachment; filename=cars_"+province+".csv")
+	} else if city != "" {
+		c.Header("Content-Disposition", "attachment; filename=cars_"+city+".csv")
+	}
 	c.Data(http.StatusOK, "text/csv", []byte(csv))
 }
 
